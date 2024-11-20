@@ -1,0 +1,32 @@
+import socket
+
+def start_client():
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect(('127.0.0.1', 12345))  # Connect to the server
+    
+    print("[CONNECTED] Connected to the server.")
+    
+    def receive_messages():
+        while True:
+            try:
+                message = client.recv(1024).decode('utf-8')
+                print(f"[SERVER] {message}")
+            except:
+                print("[ERROR] Lost connection to the server.")
+                client.close()
+                break
+    
+    # Start a thread to receive messages
+    threading.Thread(target=receive_messages, daemon=True).start()
+    
+    while True:
+        message = input("You: ")
+        if message.lower() == "exit":
+            break
+        client.send(message.encode('utf-8'))
+    
+    client.close()
+
+if __name__ == "__main__":
+    import threading
+    start_client()
